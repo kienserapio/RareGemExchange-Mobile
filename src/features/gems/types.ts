@@ -20,3 +20,18 @@ export interface Gem {
   /** ISO 8601 timestamp of when the gem entered the collection. */
   createdAt: string;
 }
+
+/**
+ * A curated gem shown on the home gallery. Uses a local image asset and
+ * pre-formatted display labels (distinct from the remote-style `Gem`).
+ */
+export interface FeaturedGem {
+  id: string;
+  name: string;
+  /** Local image asset (Metro asset id). */
+  image: number;
+  /** Uppercase meta line, e.g. "RUBY • 4.12 CT". */
+  meta: string;
+  /** Price label for the hero card, e.g. "Price on Request". */
+  priceLabel?: string;
+}

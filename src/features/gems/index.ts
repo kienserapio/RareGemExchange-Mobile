@@ -1,8 +1,14 @@
 export { GemCard } from './components/GemCard';
 export { GemList } from './components/GemList';
 export { GemDetail } from './components/GemDetail';
+export { HomeHeader } from './components/HomeHeader';
+export { CategoryChips } from './components/CategoryChips';
+export { HeroGemCard } from './components/HeroGemCard';
+export { SecondaryGemCard } from './components/SecondaryGemCard';
 export { HomeScreen } from './screens/HomeScreen';
 export { GemDetailScreen } from './screens/GemDetailScreen';
 export { useGems, useGem } from './hooks/useGems';
 export { mockGems } from './data/mockGems';
-export type { Gem, GemType } from './types';
+export { featuredGems } from './data/featuredGems';
+export { gemCategories } from './data/categories';
+export type { Gem, GemType, FeaturedGem } from './types';

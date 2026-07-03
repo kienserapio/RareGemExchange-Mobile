@@ -1,25 +1,29 @@
 # Rare Gem Exchange
 
-A product-catalog / marketplace mobile app where users browse the rare gems in the
-company's collection. This repo is a **frontend-only scaffold** — architecture,
-routing, typing, and clean component boundaries are in place, but there is **no real
-backend, auth, or API**. Screens are wired with typed mock data and placeholder
-handlers marked with `TODO`.
+A luxury product-catalog / marketplace mobile app where users browse the rare gems in
+the company's collection. This repo is **frontend-only** — architecture, routing,
+typing, and clean component boundaries are in place, but there is **no real backend,
+auth, or API**. Screens are wired with typed mock data and placeholder handlers marked
+with `TODO`.
 
-> ⚠️ Visual design is intentionally minimal — layouts are placeholders. Styling is
-> done exclusively with NativeWind `className` props so the design can be layered on
-> later without touching structure.
+```
+Cold start → Onboarding (3 slides) → Auth (membership application) → Home (gem gallery)
+```
 
 ## Tech stack
 
-| Concern       | Choice                                                     |
-| ------------- | ---------------------------------------------------------- |
-| Framework     | [Expo](https://docs.expo.dev/) SDK 57 (managed)            |
-| Runtime       | React 19.2 · React Native 0.86 (New Architecture)          |
-| Routing       | [Expo Router](https://docs.expo.dev/router) (file-based)   |
-| Language      | TypeScript 6 (strict mode)                                 |
-| Styling       | [NativeWind v4](https://www.nativewind.dev/) (Tailwind v3) |
-| Lint / Format | ESLint 9 (`eslint-config-expo`) + Prettier                 |
+| Concern       | Choice                                                                        |
+| ------------- | ----------------------------------------------------------------------------- |
+| Framework     | [Expo](https://docs.expo.dev/) SDK 57 (managed)                               |
+| Runtime       | React 19.2 · React Native 0.86 (New Architecture)                             |
+| Routing       | [Expo Router](https://docs.expo.dev/router) (file-based)                      |
+| Language      | TypeScript 6 (strict mode)                                                    |
+| Styling       | [NativeWind v4](https://www.nativewind.dev/) (Tailwind v3)                    |
+| Fonts         | Cinzel · Plus Jakarta Sans · Montserrat (`@expo-google-fonts`)                |
+| Animation     | [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated) |
+| Effects       | expo-linear-gradient · masked-view (gradient text) · @expo/vector-icons       |
+| Build         | EAS Build (Android APK preview profile)                                       |
+| Lint / Format | ESLint 9 (`eslint-config-expo`) + Prettier                                    |
 
 ## Prerequisites
 
@@ -29,32 +33,31 @@ handlers marked with `TODO`.
 ## Getting started
 
 ```bash
-# 1. Install dependencies
-npm install
-
-# 2. Start the dev server
+npm install      # .npmrc pins legacy-peer-deps for the React 19 transition
 npm start        # then press: i (iOS) · a (Android) · w (web)
 ```
 
-> **Note on `.npmrc`:** During the React 19 ecosystem transition, a transitive web
-> dependency of `expo-router` declares a React 18 peer range. `.npmrc` sets
-> `legacy-peer-deps=true` so installs resolve cleanly. Remove it once the upstream
-> peer ranges catch up.
+### App flow (all placeholder / non-functional)
 
-### Auth flow (placeholder)
+1. **Onboarding** — 3 branded splash slides with the CTA button. The last slide
+   ("Create Account") completes onboarding and routes to auth. State is **in-memory**,
+   so the splash shows on every cold start (per request).
+2. **Auth** — the Figma "membership application" (Full Name, Email, WhatsApp, Password).
+   "Submit Application" calls the placeholder `signIn` and routes home.
+3. **Home** — the Figma gem gallery: greeting + search, a hero card, category chips, a
+   two-column grid, and a **custom bottom nav** (HOME · BROWSE · INQUIRIES · PROFILE).
+   The nav is a **placeholder** — tapping moves the highlight but does not navigate yet.
 
-The app opens on the **protected** `(app)` group, whose layout guard immediately
-redirects to **Login** because the in-memory `AuthContext` starts signed-out. Enter
-_any_ email + password and tap **Log In** — the placeholder `signIn` sets a mock user
-and routes you to the catalog. Everything under `(app)` is gated on that flag.
+Route guards enforce the order: unfinished onboarding bounces to the splash flow, then
+an unauthenticated user is sent to auth.
 
 ## Available scripts
 
 | Script                 | Description                             |
 | ---------------------- | --------------------------------------- |
 | `npm start`            | Start the Expo dev server               |
-| `npm run ios`          | Start and open the iOS simulator        |
-| `npm run android`      | Start and open the Android emulator     |
+| `npm run ios`          | Start + open the iOS simulator          |
+| `npm run android`      | Start + open the Android emulator       |
 | `npm run web`          | Start the web build                     |
 | `npm run typecheck`    | `tsc --noEmit` — type-check the project |
 | `npm run lint`         | ESLint over the repo                    |
@@ -64,94 +67,108 @@ and routes you to the catalog. Everything under `(app)` is gated on that flag.
 ## Project structure
 
 ```text
-app/                         # Expo Router routes ONLY — thin layout + navigation
-├─ _layout.tsx               # Root: providers (safe-area, theme, auth) + root Stack
-├─ +not-found.tsx            # 404 fallback
-├─ (auth)/                   # Route group: standalone auth
-│  ├─ _layout.tsx            #   redirects to app when already signed in
-│  └─ login.tsx              #   -> features/auth/LoginScreen
-├─ (app)/                    # Route group: protected area (bottom tabs)
-│  ├─ _layout.tsx            #   auth guard + <Tabs>
-│  ├─ index.tsx              #   Home -> features/gems/HomeScreen
-│  └─ inquiry.tsx            #   Inquiry -> features/inquiry/InquiryScreen
-└─ gem/
-   └─ [id].tsx               # Dynamic detail -> features/gems/GemDetailScreen
+app/                          # Expo Router routes ONLY — thin layout + navigation
+├─ _layout.tsx                # Root: fonts + splash-hold + providers + root Stack
+├─ onboarding.tsx             # -> features/onboarding/OnboardingScreen
+├─ +not-found.tsx
+├─ (auth)/                    # Route group: onboarding-gated auth
+│  ├─ _layout.tsx             #   guards: onboarding done? authed?
+│  └─ login.tsx              #   -> features/auth/LoginScreen (the sign-up design)
+├─ (app)/                     # Route group: protected area (Stack; custom nav on home)
+│  ├─ _layout.tsx             #   guards: onboarding -> authed -> <Stack>
+│  ├─ index.tsx               #   Home (gem gallery)
+│  └─ inquiry.tsx             #   Inquiry chat (route kept; not yet linked in the nav)
+└─ gem/[id].tsx               # Dynamic gem detail
 
 src/
-├─ features/                 # Self-contained domain modules (feature-first)
-│  ├─ auth/                  # context, hooks, LoginForm, LoginScreen, types
-│  ├─ gems/                  # GemCard/List/Detail, screens, mock data, hooks, types
-│  └─ inquiry/              # chat screen, bubble, list, input bar, hook, types
-├─ components/
-│  └─ ui/                    # Reusable primitives: Button, Card, Input, Screen, Text
-├─ hooks/                    # Shared cross-feature hooks (e.g. useDebounce)
-├─ lib/                      # Third-party client wrappers / config (placeholder api)
-├─ constants/                # colors, spacing, app config, route paths
-├─ types/                    # Shared/global TypeScript types
-└─ utils/                    # Pure helpers (cn, formatPrice, formatTime)
-
-assets/                      # Icons & splash
-global.css                   # Tailwind directives consumed by NativeWind
-```
-
-Each feature exposes a **barrel** `index.ts`, so imports stay clean:
-
-```ts
-import { HomeScreen, useGems, type Gem } from '@/features/gems';
-import { Button, Screen, Text } from '@/components/ui';
+├─ features/
+│  ├─ onboarding/             # context, 3-slide data, background/slide/progress, screen
+│  ├─ auth/                   # context, form hook, BrandHeader / UnderlineInput / form
+│  ├─ gems/                   # home (HomeHeader/HeroGemCard/SecondaryGemCard/CategoryChips)
+│  │                          #   + featured data, plus the older list/card/detail + hooks
+│  └─ inquiry/               # chat screen, bubble, list, input bar
+├─ components/ui/             # Primitives: Button, Card, Input, Screen, Text, CtaButton,
+│                            #   GradientText, BottomNav, KeyboardAwareScrollView
+├─ hooks/ · lib/ · constants/ · types/ · utils/
+│
+assets/images/                # background.jpg, logo-gem.png, gem-*.jpg (downloaded from Figma)
+tailwind.config.js            # Gold/dark palette + custom fontFamily tokens
+eas.json                      # EAS build profiles (preview = internal APK)
 ```
 
 ## Routing map
 
-Route groups `(auth)` / `(app)` do **not** appear in the URL.
+Route groups `(auth)` / `(app)` do not appear in the URL.
 
-| Route file              | URL         | Screen component (`src/features/…`) |
-| ----------------------- | ----------- | ----------------------------------- |
-| `app/(auth)/login.tsx`  | `/login`    | `auth/screens/LoginScreen`          |
-| `app/(app)/index.tsx`   | `/`         | `gems/screens/HomeScreen` (catalog) |
-| `app/(app)/inquiry.tsx` | `/inquiry`  | `inquiry/screens/InquiryScreen`     |
-| `app/gem/[id].tsx`      | `/gem/:id`  | `gems/screens/GemDetailScreen`      |
-| `app/+not-found.tsx`    | (unmatched) | inline 404                          |
+| Route file              | URL           | Screen                                   |
+| ----------------------- | ------------- | ---------------------------------------- |
+| `app/onboarding.tsx`    | `/onboarding` | `onboarding/OnboardingScreen` (3 slides) |
+| `app/(auth)/login.tsx`  | `/login`      | `auth/LoginScreen` (membership form)     |
+| `app/(app)/index.tsx`   | `/`           | `gems/HomeScreen` (gem gallery)          |
+| `app/(app)/inquiry.tsx` | `/inquiry`    | `inquiry/InquiryScreen`                  |
+| `app/gem/[id].tsx`      | `/gem/:id`    | `gems/GemDetailScreen`                   |
 
-Navigation:
+## Keyboard & safe area (RN practices)
 
-- **Home → Detail:** `GemCard` press calls `router.push(ROUTES.gemDetail(id))`
-  (`/gem/:id`). Detail is a **root-Stack** screen, so it covers the tab bar.
-- **Login → Home:** `router.replace('/')` after the placeholder `signIn`.
+- **Safe areas** everywhere via `react-native-safe-area-context`: the home header pads
+  `insets.top` (below the notch/Dynamic Island), the bottom nav + chat input pad
+  `insets.bottom` (above the home indicator), and scroll screens pad both.
+- **Keyboard**: the reusable `KeyboardAwareScrollView` (used by auth) keeps focused
+  fields above the keyboard — `automaticallyAdjustKeyboardInsets` on iOS and Android's
+  `adjustResize` (`app.json` → `android.softwareKeyboardLayoutMode: "resize"`). The chat
+  input uses `KeyboardAvoidingView` so it rides above the keyboard.
 
-## Conventions
+## Android APK build (EAS Preview)
 
-- **Functional components + hooks only**, one component per file, **named exports**
-  (route files are the only default exports — Expo Router requires it).
-- **Feature-first:** feature-specific components/hooks/types are co-located under
-  `src/features/<domain>`; only truly shared code lives in `components/ui`, `hooks`,
-  `utils`, `constants`, `lib`, `types`.
-- **Path alias:** `@/*` → `src/*` (see `tsconfig.json`).
-- **Styling:** NativeWind `className` only (no `StyleSheet.create`). The single
-  exception is `Screen`, which applies dynamic safe-area insets via an inline style
-  because inset values can't be expressed as a class.
-- **Class merging:** use `cn(...)` from `@/utils` for conditional class strings.
+`eas.json` defines a **`preview`** profile that outputs an installable **APK**:
+
+```jsonc
+"preview": { "distribution": "internal", "android": { "buildType": "apk" } }
+```
+
+`app.json` has a unique `android.package` (`com.raregemexchange.app`). `eas-cli` is
+already installed globally.
+
+**Run the build (on your machine — it uses your Expo account):**
+
+```bash
+eas login                                            # if you're not logged in yet
+eas build --platform android --profile preview       # kicks off the cloud build
+```
+
+- **Login:** `eas login` needs a free [Expo account](https://expo.dev/signup). On the
+  **first** build EAS also links this project (writes `extra.eas.projectId` into
+  `app.json`) — accept the prompt, or run `eas init` first.
+- **Keystore:** the first Android build asks to generate a signing keystore — choose
+  **Yes, let EAS manage it** (stored securely on Expo's servers).
+- **Result:** the build runs on EAS (~10–20 min); you get a **downloadable APK URL** +
+  QR code. Anyone can install it (Android: allow "install from unknown sources").
 
 ## Where the real logic plugs in
 
-All placeholders are marked with `TODO`. The main seams:
+All placeholders are marked `TODO`. Main seams:
 
-| Area          | File                                           | Replace with                          |
-| ------------- | ---------------------------------------------- | ------------------------------------- |
-| Auth          | `src/features/auth/context/AuthContext.tsx`    | Real sign-in + token persistence      |
-| API client    | `src/lib/api.ts`                               | Real HTTP client (fetch/axios) + auth |
-| Gem data      | `src/features/gems/hooks/useGems.ts` + `data/` | Real fetch (e.g. React Query)         |
-| Inquiry / bot | `src/features/inquiry/hooks/useInquiryChat.ts` | Real chat/inquiry backend             |
+| Area          | File                                                              | Replace with                         |
+| ------------- | ----------------------------------------------------------------- | ------------------------------------ |
+| Onboarding    | `src/features/onboarding/context/OnboardingContext.tsx`           | Persisted "seen" flag (AsyncStorage) |
+| Auth          | `src/features/auth/context/AuthContext.tsx` + `hooks/useLogin.ts` | Real registration / sign-in          |
+| Home nav      | `src/components/ui/BottomNav.tsx` + `HomeScreen`                  | Wire items to routes when ready      |
+| Home actions  | `HomeScreen` (`handlePlaceholder`) / cards / search               | Real inquiry, search, pagination     |
+| API client    | `src/lib/api.ts`                                                  | Real HTTP client + auth headers      |
+| Inquiry / bot | `src/features/inquiry/hooks/useInquiryChat.ts`                    | Real chat backend                    |
 
-## Notes & next steps
+## Notes
 
-- **Typed routes** are off (`app.json` → `experiments.typedRoutes`). Enable for
-  compile-time href checking; then use the object form
-  `router.push({ pathname: '/gem/[id]', params: { id } })` for dynamic routes.
-- **Tab icons** are omitted to keep the placeholder minimal — add `tabBarIcon` in
-  `app/(app)/_layout.tsx` (e.g. `@expo/vector-icons`) when designing the UI.
-- **Theme tokens** live in `src/constants/colors.ts` for native props that don't take
-  a `className`; mirror them into `tailwind.config.js` to expose as utilities.
+- **ESLint is pinned to v9** (not 10): `eslint-config-expo@57`'s `eslint-plugin-react`
+  calls an API ESLint 10 removed, which crashes lint.
+- **`.npmrc` sets `legacy-peer-deps=true`** — `expo-router@57` pulls a transitive web dep
+  with a React 18 peer range, which conflicts with React 19 under strict resolution.
+- **reanimated 4** requires `react-native-worklets` + `babel-preset-expo` (both installed).
+- **Typed routes** are off (`app.json` → `experiments.typedRoutes`).
+- Translucent panels approximate the Figma `backdrop-blur`; add `expo-blur`'s `BlurView`
+  for true frosted glass. The Inquiry screen is still the earlier light placeholder.
+- Verified via `npm run typecheck`, `npm run lint`, and a full `expo export` (Metro)
+  bundle. Runtime was not exercised on a device/simulator in this environment.
 
 ```
 

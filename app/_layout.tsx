@@ -1,33 +1,57 @@
 import '../global.css';
 
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useColorScheme } from 'react-native';
+import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { appFonts, colors } from '@/constants';
 import { AuthProvider } from '@/features/auth';
+import { OnboardingProvider } from '@/features/onboarding';
+
+// Keep the native splash visible until custom fonts are ready.
+void SplashScreen.preventAutoHideAsync();
 
 /**
- * Root layout: global providers (safe area, navigation theme, auth) wrapping the
- * root Stack. Route files stay thin — screen logic lives in `src/features`.
+ * Root layout: loads fonts, then mounts global providers (safe area, onboarding,
+ * auth) around the root Stack. Route files stay thin — screen logic lives in
+ * `src/features`. The app is dark-themed, so screens paint their own black
+ * backgrounds and the status bar is forced light.
  */
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  const [fontsLoaded, fontError] = useFonts(appFonts);
+
+  useEffect(() => {
+    if (fontsLoaded || fontError) {
+      void SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontError]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
 
   return (
     <SafeAreaProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <OnboardingProvider>
         <AuthProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(auth)" />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: colors.black },
+            }}
+          >
+            <Stack.Screen name="onboarding" options={{ animation: 'fade' }} />
+            <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />
             <Stack.Screen name="(app)" />
             <Stack.Screen name="gem/[id]" options={{ headerShown: true }} />
             <Stack.Screen name="+not-found" options={{ headerShown: true, title: 'Not Found' }} />
           </Stack>
-          <StatusBar style="auto" />
+          <StatusBar style="light" />
         </AuthProvider>
-      </ThemeProvider>
+      </OnboardingProvider>
     </SafeAreaProvider>
   );
 }

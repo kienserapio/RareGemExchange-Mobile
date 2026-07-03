@@ -3,6 +3,7 @@
  * the URL, so these map to the public paths Expo Router resolves at runtime.
  */
 export const ROUTES = {
+  onboarding: '/onboarding',
   login: '/login',
   home: '/',
   inquiry: '/inquiry',
