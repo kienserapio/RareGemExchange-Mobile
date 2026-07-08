@@ -1,9 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, Text as RNText, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { BottomNav, type BottomNavItem } from '@/components/ui';
+import { BottomNav } from '@/components/ui';
+import { ROUTES } from '@/constants';
 
 import { CategoryChips } from '../components/CategoryChips';
 import { HeroGemCard } from '../components/HeroGemCard';
@@ -11,13 +13,8 @@ import { HomeHeader } from '../components/HomeHeader';
 import { SecondaryGemCard } from '../components/SecondaryGemCard';
 import { gemCategories } from '../data/categories';
 import { featuredGems } from '../data/featuredGems';
-
-const navItems: BottomNavItem[] = [
-  { key: 'home', label: 'Home', icon: 'home-outline' },
-  { key: 'browse', label: 'Browse', icon: 'diamond-outline' },
-  { key: 'inquiries', label: 'Inquiries', icon: 'chatbubble-outline' },
-  { key: 'profile', label: 'Profile', icon: 'person-outline' },
-];
+import { bottomNavItems } from '../data/navItems';
+import type { FeaturedGem } from '../types';
 
 /**
  * Home = the gem gallery (Figma home design). Fixed header + bottom nav with a
@@ -26,6 +23,7 @@ const navItems: BottomNavItem[] = [
  */
 export function HomeScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState(0);
   const [activeNav, setActiveNav] = useState('browse');
@@ -36,6 +34,13 @@ export function HomeScreen() {
   const handlePlaceholder = useCallback(() => {
     // TODO: wire gem inquiry / pagination to real actions once the backend exists.
   }, []);
+
+  const handleSelectGem = useCallback(
+    (gem: FeaturedGem) => {
+      router.push(ROUTES.gemDetail(gem.id));
+    },
+    [router],
+  );
 
   return (
     <View className="flex-1 bg-charcoal">
@@ -50,7 +55,7 @@ export function HomeScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View className="px-4">
-          <HeroGemCard gem={hero} onInquire={handlePlaceholder} />
+          <HeroGemCard gem={hero} onPress={() => handleSelectGem(hero)} onInquire={handlePlaceholder} />
         </View>
 
         <CategoryChips
@@ -61,7 +66,7 @@ export function HomeScreen() {
 
         <View className="flex-row gap-3 px-4">
           {secondaryGems.map((gem) => (
-            <SecondaryGemCard key={gem.id} gem={gem} />
+            <SecondaryGemCard key={gem.id} gem={gem} onPress={() => handleSelectGem(gem)} />
           ))}
         </View>
 
@@ -73,7 +78,7 @@ export function HomeScreen() {
         </Pressable>
       </ScrollView>
 
-      <BottomNav items={navItems} activeKey={activeNav} onSelect={setActiveNav} />
+      <BottomNav items={bottomNavItems} activeKey={activeNav} onSelect={setActiveNav} />
     </View>
   );
 }

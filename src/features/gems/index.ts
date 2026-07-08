@@ -7,7 +7,7 @@ export { HeroGemCard } from './components/HeroGemCard';
 export { SecondaryGemCard } from './components/SecondaryGemCard';
 export { HomeScreen } from './screens/HomeScreen';
 export { GemDetailScreen } from './screens/GemDetailScreen';
-export { useGems, useGem } from './hooks/useGems';
+export { useGems, useGem, useFeaturedGem } from './hooks/useGems';
 export { mockGems } from './data/mockGems';
 export { featuredGems } from './data/featuredGems';
 export { gemCategories } from './data/categories';

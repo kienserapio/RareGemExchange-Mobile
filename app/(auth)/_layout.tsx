@@ -12,7 +12,7 @@ export default function AuthLayout() {
   const { isAuthenticated } = useAuth();
 
   if (!hasCompletedOnboarding) {
-    return <Redirect href="/onboarding" />;
+    return <Redirect href="/splash" />;
   }
   if (isAuthenticated) {
     return <Redirect href="/" />;

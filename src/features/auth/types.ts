@@ -13,3 +13,6 @@ export interface AuthState {
   user: AuthUser | null;
   isAuthenticated: boolean;
 }
+
+/** Steps of the registration wizard (details, then mobile OTP, then email OTP). */
+export type RegistrationStep = 'details' | 'verifyMobile' | 'verifyEmail';

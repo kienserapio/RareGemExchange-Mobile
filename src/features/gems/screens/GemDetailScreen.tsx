@@ -1,31 +1,34 @@
 import { Stack } from 'expo-router';
-import { View } from 'react-native';
-
-import { Text } from '@/components/ui';
+import { Text as RNText, View } from 'react-native';
 
 import { GemDetail } from '../components/GemDetail';
-import { useGem } from '../hooks/useGems';
+import { useFeaturedGem } from '../hooks/useGems';
 
 interface GemDetailScreenProps {
   gemId: string;
 }
 
-/** Detail screen for the dynamic gem/[id] route. */
+/** Detail screen for the dynamic gem/[id] route (Figma "Gem Details" design). */
 export function GemDetailScreen({ gemId }: GemDetailScreenProps) {
-  const { gem } = useGem(gemId);
+  const gem = useFeaturedGem(gemId);
 
   if (!gem) {
     return (
-      <View className="flex-1 items-center justify-center gap-2 bg-white p-6">
-        <Text variant="subtitle">Gem not found.</Text>
-        <Text variant="caption">We couldn&apos;t find a gem with id &quot;{gemId}&quot;.</Text>
-      </View>
+      <>
+        <Stack.Screen options={{ headerShown: true, title: 'Gem not found' }} />
+        <View className="flex-1 items-center justify-center gap-2 bg-charcoal p-6">
+          <RNText className="font-cinzel-bold text-lg text-gold">Gem not found</RNText>
+          <RNText className="font-jakarta text-sm text-subtitle">
+            We couldn&apos;t find a gem with id &quot;{gemId}&quot;.
+          </RNText>
+        </View>
+      </>
     );
   }
 
   return (
     <>
-      <Stack.Screen options={{ title: gem.name }} />
+      <Stack.Screen options={{ headerShown: false }} />
       <GemDetail gem={gem} />
     </>
   );

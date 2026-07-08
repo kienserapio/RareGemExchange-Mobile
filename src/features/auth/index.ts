@@ -1,8 +1,13 @@
 export { AuthProvider, useAuth } from './context/AuthContext';
-export { useLogin } from './hooks/useLogin';
+export { useRegistration } from './hooks/useRegistration';
+export { useOtpChannel, type OtpChannel } from './hooks/useOtpChannel';
 export { BrandHeader } from './components/BrandHeader';
 export { LegalFooter } from './components/LegalFooter';
-export { LoginForm } from './components/LoginForm';
 export { UnderlineInput } from './components/UnderlineInput';
-export { LoginScreen } from './screens/LoginScreen';
-export type { AuthUser, AuthState, LoginCredentials } from './types';
+export { CountryCodePicker } from './components/CountryCodePicker';
+export { OtpInput } from './components/OtpInput';
+export { RegistrationDetailsForm } from './components/RegistrationDetailsForm';
+export { RegistrationOtpStep } from './components/RegistrationOtpStep';
+export { RegistrationScreen } from './screens/RegistrationScreen';
+export { countryCodes, type CountryCode } from './data/countryCodes';
+export type { AuthUser, AuthState, LoginCredentials, RegistrationStep } from './types';
